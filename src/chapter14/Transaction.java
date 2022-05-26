@@ -16,9 +16,10 @@ import javax.sql.DataSource;
 
 import tool.Page;
 
-@WebServlet(urlPatterns = { "/chapter14/all" })
-public class ALL extends HttpServlet {
-	public void doGet(
+@WebServlet(urlPatterns = { "/chapter14/transaction" })
+public class Transaction extends HttpServlet {
+
+	public void doPost(
 			HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
@@ -30,18 +31,36 @@ public class ALL extends HttpServlet {
 					"java:/comp/env/jdbc/book");
 			Connection con = ds.getConnection();
 
-			PreparedStatement st = con.prepareStatement(
-					"select * from product");
-			ResultSet rs = st.executeQuery();
+			String name = request.getParameter("name");
+			int price = Integer.parseInt(request.getParameter("price"));
 
+			con.setAutoCommit(false);
+
+			PreparedStatement st = con.prepareStatement(
+					"insert into product values(null, ?, ?)");
+			st.setString(1, name);
+			st.setInt(2, price);
+			st.executeUpdate();
+
+			st = con.prepareStatement(
+					"select * from product where name like ?");
+
+			st.setString(1, name);
+			ResultSet rs = st.executeQuery();
+			int line = 0;
 			while (rs.next()) {
-				out.println(rs.getInt("id"));
-				out.println(":");
-				out.println(rs.getString("name"));
-				out.println(":");
-				out.println(rs.getInt("price"));
-				out.println("<br>");
+				line++;
 			}
+
+			if (line == 1) {
+				con.commit();
+				out.println("商品を登録しました。");
+			} else {
+				con.rollback();
+				out.println("商品はすでに登録されています。");
+			}
+
+			con.setAutoCommit(true);
 
 			st.close();
 			con.close();

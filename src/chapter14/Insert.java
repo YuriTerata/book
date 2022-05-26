@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 import javax.naming.InitialContext;
 import javax.servlet.ServletException;
@@ -16,9 +15,10 @@ import javax.sql.DataSource;
 
 import tool.Page;
 
-@WebServlet(urlPatterns = { "/chapter14/all" })
-public class ALL extends HttpServlet {
-	public void doGet(
+@WebServlet(urlPatterns = { "/chapter14/insert" })
+public class Insert extends HttpServlet {
+
+	public void doPost(
 			HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
@@ -30,17 +30,17 @@ public class ALL extends HttpServlet {
 					"java:/comp/env/jdbc/book");
 			Connection con = ds.getConnection();
 
-			PreparedStatement st = con.prepareStatement(
-					"select * from product");
-			ResultSet rs = st.executeQuery();
+			String name = request.getParameter("name");
+			int price = Integer.parseInt(request.getParameter("price"));
 
-			while (rs.next()) {
-				out.println(rs.getInt("id"));
-				out.println(":");
-				out.println(rs.getString("name"));
-				out.println(":");
-				out.println(rs.getInt("price"));
-				out.println("<br>");
+			PreparedStatement st = con.prepareStatement(
+					"insert into product values(null, ?, ?)");
+			st.setString(1, name);
+			st.setInt(2, price);
+			int line = st.executeUpdate();
+
+			if (line > 0) {
+				out.println("追加に成功しました。");
 			}
 
 			st.close();

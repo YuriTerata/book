@@ -16,9 +16,10 @@ import javax.sql.DataSource;
 
 import tool.Page;
 
-@WebServlet(urlPatterns = { "/chapter14/all" })
-public class ALL extends HttpServlet {
-	public void doGet(
+@WebServlet(urlPatterns = { "/chapter14/search" })
+public class Search extends HttpServlet {
+
+	public void doPost(
 			HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
@@ -30,8 +31,11 @@ public class ALL extends HttpServlet {
 					"java:/comp/env/jdbc/book");
 			Connection con = ds.getConnection();
 
+			String keyword = request.getParameter("keyword");
+
 			PreparedStatement st = con.prepareStatement(
-					"select * from product");
+					"select * from product where name like ?");
+			st.setString(1, "%" + keyword + "%");
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
