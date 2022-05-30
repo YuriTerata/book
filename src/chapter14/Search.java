@@ -20,8 +20,8 @@ import tool.Page;
 public class Search extends HttpServlet {
 
 	public void doPost(
-			HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			HttpServletRequest request, HttpServletResponse response
+			) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		Page.header(out);
 
@@ -31,10 +31,11 @@ public class Search extends HttpServlet {
 					"java:/comp/env/jdbc/book");
 			Connection con = ds.getConnection();
 
+			//DBのVARCHARがString
 			String keyword = request.getParameter("keyword");
 
 			PreparedStatement st = con.prepareStatement(
-					"select * from product where name like ?");
+					"SELECT * FROM product WHERE name LIKE ?");
 			st.setString(1, "%" + keyword + "%");
 			ResultSet rs = st.executeQuery();
 

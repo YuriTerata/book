@@ -12,13 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import tool.Page;
 
-
 @WebServlet(urlPatterns = { "/practice_jsp/reservation" })
 public class Reservation extends HttpServlet {
 
 	public void doPost(
-			HttpServletRequest request, HttpServletResponse response
-			) throws ServletException, IOException {
+			HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		PrintWriter out = response.getWriter();
 
@@ -44,7 +42,14 @@ public class Reservation extends HttpServlet {
 		if (option != null) {
 			for (String item : option) {
 				out.println("「" + item + "」");
+
+				//拡張for文内での比較する方法
+				if(item.equals("3歳以下の子供がいる")){
+					out.println("<p>お子様向けに別プランがありますが、そちらを予約しますか？</p>");
+				}
 			}
+
+			//配列をコレクションに変換してcontainsで探す方法
 			if (Arrays.asList(option).contains("3歳以下の子供がいる")) {
 				out.println("<p>お子様向けに別プランがありますが、そちらを予約しますか？</p>");
 			}
@@ -56,6 +61,5 @@ public class Reservation extends HttpServlet {
 		Page.footer(out);
 
 	}
-
 
 }
